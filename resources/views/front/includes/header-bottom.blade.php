@@ -3,7 +3,7 @@
         <div class="header_bottom-box">
             <div class="header_bottom_left">
                 <div class="logo">
-                    <a href="index.html"><img src="{{asset('/front')}}/images/logo.png" alt=""/></a>
+                    <a href="{{ url('/') }}"><img src="{{asset('/front')}}/images/logo.png" alt=""/></a>
                 </div>
                 <ul class="clock">
                     <i class="clock_icon"> </i>

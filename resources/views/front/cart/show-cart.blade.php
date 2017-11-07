@@ -68,10 +68,14 @@
                     <table class="table table-bordered">
                         <tr>
                             <td>
-                                <a href="" class="btn btn-primary">Continue Shopping</a>
+                                <a href="{{ url('/') }}" class="btn btn-primary">Continue Shopping</a>
                             </td>
                             <td>
-                                <a href="{{ url('/checkout') }}" class="btn btn-primary">Checkout</a>
+                                @if(Session::get('customerId'))
+                                <a href="{{ url('/shipping-info') }}" class="btn btn-primary">Checkout</a>
+                                @else
+                                    <a href="{{ url('/checkout') }}" class="btn btn-primary">Checkout</a>
+                                @endif
                             </td>
                         </tr>
                     </table>

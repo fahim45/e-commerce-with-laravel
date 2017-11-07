@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Customer;
+use App\Order;
+use App\OrderDetail;
+use App\Payment;
+use App\Shipping;
+use Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
@@ -74,7 +79,60 @@ class CheckoutController extends Controller
     }
 
     public function showShippingInfo(){
-        return view('front.checkout.shipping-info');
+        $customer = Customer::find(Session::get('customerId'));
+        return view('front.checkout.shipping-info',['customer'=>$customer]);
+    }
+
+    public function saveShippingInfo(Request $request){
+        $shipping = new Shipping();
+        $shipping->full_name = $request->full_name;
+        $shipping->email = $request->email;
+        $shipping->phone_no = $request->phone_no;
+        $shipping->address = $request->address;
+        $shipping->save();
+
+        Session::put('shippingId', $shipping->id);
+
+        return redirect('/payment-info');
+    }
+
+    public function showPaymentForm(){
+        return view('front.checkout.payment-form');
+    }
+
+    public function saveOrderInfo(Request $request){
+        $paymentType = $request->payment_type;
+        if ($paymentType == 'Cash On Delivery'){
+            $order = new Order();
+            $order->customer_id = Session::get('customerId');
+            $order->shipping_id = Session::get('shippingId');
+            $order->order_total = Session::get('grandTotal');
+            $order->save();
+
+            $payment = new Payment();
+            $payment->order_id = $order->id;
+            $payment->payment_type = $paymentType;
+            $payment->save();
+
+            $cartProducts = Cart::content();
+            foreach ($cartProducts as $cartProduct){
+                $orderDetails = new OrderDetail();
+                $orderDetails->order_id = $order->id;
+                $orderDetails->product_id = $cartProduct->id;
+                $orderDetails->product_name = $cartProduct->name;
+                $orderDetails->product_price = $cartProduct->price;
+                $orderDetails->product_quantity = $cartProduct->qty;
+                $orderDetails->save();
+            }
+
+            Cart::destroy();
+
+            return redirect('/')->with('message', 'Thanks for your valuable order. We will contact with you soon.');
+        } else if ($paymentType == 'bKash'){
+
+        } else if($paymentType == 'Paypal'){
+
+        }
     }
 
 }

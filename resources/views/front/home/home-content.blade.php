@@ -16,6 +16,7 @@
 
     {{-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>For Top Content<<<<<<<<<<<<<<<<<<<<<<<<<<<<<--}}
     <div class="content_top">
+        <h1 class="text-center text-success">{{ Session::get('message') }}</h1>
         <div class="container">
             <div class="grid_1">
                 <div class="col-md-3">
