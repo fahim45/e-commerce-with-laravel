@@ -77,8 +77,8 @@
         <div class="span_3">
             @foreach($categoryProducts as $categoryProduct)
             <div class="col-sm-3 grid_1">
-                <a href="single.html">
-                    <img src="{{ asset($categoryProduct->product_image) }}" class="img-responsive" alt="">
+                <a href="#">
+                    <img src="{{ asset($categoryProduct->product_image) }}" class="img-responsive" alt="" style="width: 100px; height:100px;">
                     <h3>{{ $categoryProduct->product_name }}</h3>
                     <p>Duis autem vel eum iriure</p>
                     <h4>TK. {{ $categoryProduct->product_price }}</h4>

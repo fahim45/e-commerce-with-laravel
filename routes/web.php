@@ -82,8 +82,9 @@ Route::get('/product/delete-product/{id}', 'ProductController@deleteProductInfo'
 Route::get('/manage-order', 'OrderController@manageOrderInfo')->middleware('AuthenticateMiddleware');
 Route::get('/order/view-order-details/{id}', 'OrderController@viewOrderInfo')->middleware('AuthenticateMiddleware');
 Route::get('/order/view-order-invoice/{id}', 'OrderController@viewOrderInvoice')->middleware('AuthenticateMiddleware');
+Route::get('/pdf/{id}', 'OrderController@invoicePdf')->middleware('AuthenticateMiddleware');
 Route::get('/order/edit-order/{id}', 'OrderController@editOrderInfo')->middleware('AuthenticateMiddleware');
-Route::post('/update-order', 'OrderController@updateOrderInfo')->middleware('AuthenticateMiddleware');
+Route::post('/order/update-order', 'OrderController@updateOrderInfo')->middleware('AuthenticateMiddleware');
 Route::get('/order/delete-order/{id}', 'OrderController@viewOrderInvoice')->middleware('AuthenticateMiddleware');
 
 /*Order Info*/

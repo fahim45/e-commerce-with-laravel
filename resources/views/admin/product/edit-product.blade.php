@@ -45,8 +45,8 @@
                             <div class="col-sm-9">
                                 <select name="category_id" id="" class="form-control">
                                     <option>Select Category Name</option>
-                                    @foreach($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                                    @foreach($publishedCategories as $publishedCategory)
+                                        <option value="{{ $publishedCategory->id }}">{{ $publishedCategory->category_name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -56,8 +56,8 @@
                             <div class="col-sm-9">
                                 <select name="brand_id" id="" class="form-control">
                                     <option>Select Brand Name</option>
-                                    @foreach($brands as $brand)
-                                        <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                    @foreach($publishedBrands as $publishedBrand)
+                                        <option value="{{ $publishedBrand->id }}">{{ $publishedBrand->brand_name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -98,6 +98,10 @@
                             <label for="" class="col-sm-3">Product Sub Image</label>
                             <div class="col-sm-9">
                                 <input type="file" name="sub_image[]" accept="image/*" multiple/>
+                                @foreach($subImages as $subImage)
+                                    <img class="img-bordered" src="{{ asset($subImage->sub_image)}}"
+                                         alt="Image Not Found" height="80px" width="80px">
+                                @endforeach
                             </div>
                         </div>
                         <div class="form-group">

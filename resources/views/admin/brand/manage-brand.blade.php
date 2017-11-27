@@ -48,7 +48,12 @@
                                     <td>{{ $i++ }}</td>
                                     <td>{{ $brand->brand_name }}</td>
                                     <td>{!! $brand->brand_description !!}</td>
-                                    <td>{{ $brand->publication_status==1? 'Published':'Unpublished' }}</td>
+                                    <td>@if($brand->publication_status==1)
+                                            <span class="label label-success">{{ 'Published' }}</span>
+                                        @else
+                                            <span class="label label-warning">{{ 'Unpublished' }}</span>
+                                            @endif
+                                    </td>
                                     <td>
                                         @if($brand-> publication_status == 1)
                                             <a href="{{ url('/brand/unpublished-brand/'.$brand->id) }}" title="Published"

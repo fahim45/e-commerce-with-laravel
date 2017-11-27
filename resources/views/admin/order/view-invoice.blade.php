@@ -119,15 +119,15 @@
                     <table>
                         <tr>
                             <td class="title">
-                                <img src="https://www.sparksuite.com/images/logo.png" alt="Invoice"
+                                <img src="#" alt="Invoice"
                                      style="width:100%; max-width:300px;">
                             </td>
 
                             <td>
                                 <h3><u>Order Info:</u></h3>
-                                Invoice #: <br>
-                                Created: <br>
-                                Due: February 1, 2015
+                                Invoice #: {{  $order->id }}<br>
+                                Created: {{ date('F d Y', strtotime( $order->created_at )) }}<br>
+                                Due: {{ date('F d Y') }}
                             </td>
                         </tr>
                     </table>
@@ -160,33 +160,36 @@
 
             <tr class="heading">
                 <td> Payment Method</td>
-                <td> Check #</td>
             </tr>
-
             <tr class="details">
-                <td> Check</td>
-                <td> 1000</td>
+                @foreach($payments as $payment)
+                <td> {{ $payment->payment_type }}</td>
+                    @endforeach
             </tr>
 
             <tr class="heading">
                 <td colspan="2"> Product Information</td>
             </tr>
-
-            <tr class="item">
-                <td> Product Name</td>
-                <td> {{ $product->product_name }} </td>
+        </table>
+        <table class="table">
+            <tr>
+                <th> Product Name</th>
+                <th> Product Price</th>
+                <th> Quantity</th>
             </tr>
-            <tr class="item">
-                <td> Product Price</td>
-                <td> TK. {{ $product->product_price }} </td>
-            </tr>
-            <tr class="item last">
-                <td> Quantity</td>
-                <td> {{ $product->product_quantity }} </td>
+            @php($sum=0)
+            @foreach($products as $product)
+            <tr class="">
+                <td> {{ $product->product_name }}</td>
+                <td> {{ $product->product_price }}</td>
+                <td> {{ $product->product_quantity }}</td>
             </tr>
             <tr class="total">
                 <th></th>
-                <td> Total Price TK. {{ $product->product_price*$product->product_quantity }}</td>
+                 @php( $total = $product->product_price*$product->product_quantity )
+                @php( $sum = $sum+$total )
+                @endforeach
+                <td>Total Price TK. {{ $grandTotal = $sum }}</td>
             </tr>
         </table>
     </div>

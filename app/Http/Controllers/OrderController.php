@@ -8,6 +8,7 @@ use App\OrderDetail;
 use App\Payment;
 use App\Product;
 use App\Shipping;
+use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -40,11 +41,44 @@ class OrderController extends Controller
         $customer = Customer::find($order->customer_id);
         $shipping = Shipping::find($order->shipping_id);
         $products = OrderDetail::where('order_id',$order->id)->get();
+        $payment = DB::table('orders')
+            ->join('payments', 'orders.id', '=', 'payments.order_id')
+            ->select('orders.id', 'payments.payment_type')
+            ->where('order_id',$order->id)
+            ->get();
+       // return $payment;
+//        return $products;
         return view('admin.order.view-invoice',[
+            'order'=>$order,
+            'payments'=>$payment,
             'customer'=>$customer,
             'shipping'=>$shipping,
-            'product'=>$products
+            'products'=>$products
         ]);
+    }
+    public function invoicePdf($id){
+        $order = Order::find($id);
+        $customer = Customer::find($order->customer_id);
+        //return $customer;
+        $shipping = Shipping::find($order->shipping_id);
+        $products = OrderDetail::where('order_id',$order->id)->get();
+        $payment = DB::table('orders')
+            ->join('payments', 'orders.id', '=', 'payments.order_id')
+            ->select('orders.id', 'payments.payment_type')
+            ->where('order_id',$order->id)
+            ->get();
+
+        $pdf = PDF::loadView('admin.order.invoice',[
+            'order'=>$order,
+            'payments'=>$payment,
+            'customer'=>$customer,
+            'shipping'=>$shipping,
+            'products'=>$products
+        ]);
+        $invoiceName = $customer->first_name.' '.$customer->last_name;
+        //return $invoiceName;
+        return $pdf->stream($invoiceName.'.pdf');
+        /*return $pdf->download('invoice.pdf');*/ /*For Directly Download*/
     }
 
     public function editOrderInfo($id){
@@ -72,6 +106,6 @@ class OrderController extends Controller
             $product->save();
         }
 
-        return redirect('/admin/order/manage-order')->with('message', 'Order Info Updated Successfully.');
+        return redirect('/manage-order')->with('message', 'Order Info Updated Successfully.');
     }
 }

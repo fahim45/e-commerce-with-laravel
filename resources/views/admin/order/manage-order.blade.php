@@ -56,7 +56,7 @@
                                     <td>{{ $order->order_status }}</td>
                                     <td>{{ $order->payment_type }}</td>
                                     <td>{{ $order->payment_status }}</td>
-                                    <td>{{ $order->created_at }}</td>
+                                    <td>{{ date('F d Y', strtotime( $order->created_at )) }}</td>
                                     <td>
                                         <a href="{{ url('/order/view-order-details/'.$order->id) }}" title="View Order Details" class="btn btn-info btn-xs">
                                             <span class="fa fa-fw fa-eye-slash"></span>
@@ -64,7 +64,7 @@
                                         <a href="{{ url('/order/view-order-invoice/'.$order->id) }}" title="View Order Invoice" class="btn btn-warning btn-xs">
                                             <span class="fa fa-fw fa-eye"></span>
                                         </a>
-                                        <a href="{{ url('/order/download-invoice/'.$order->id) }}" title="Download Invoice" class="btn btn-success btn-xs">
+                                        <a href="{{ url('/pdf/'.$order->id) }}" title="Download Invoice" class="btn btn-success btn-xs">
                                             <span class="fa fa-fw fa-download"></span>
                                         </a>
                                         <a href="{{ url('/order/edit-order/'.$order->id) }}" title="Edit Order" class="btn btn-primary btn-xs">

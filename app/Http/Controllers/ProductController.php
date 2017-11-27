@@ -8,7 +8,6 @@ use App\Product;
 use App\SubImage;
 use Illuminate\Http\Request;
 use DB;
-
 use Image;
 
 class ProductController extends Controller
@@ -29,10 +28,12 @@ class ProductController extends Controller
         ]);
         //return $request->all();
         $productImage = $request->file('product_image');
-        $imageName  =   $productImage->getClientOriginalName();
-        $directory = 'product-image/';
-        $imageUrl   = $directory.$imageName;
-        Image::make($productImage)->save($imageUrl);
+        $imageExtension = $productImage->getClientOriginalExtension();
+        $imageName = time().'.'.$imageExtension;
+        $directory = 'product-images/';
+        $imageUrl = $directory.$imageName;
+        Image::make($productImage)->resize(310,350)->save($imageUrl);
+
 
         $product = new Product();
         $product->product_name = $request->product_name;
@@ -50,10 +51,11 @@ class ProductController extends Controller
 
         $subImages = $request->file('sub_image');
         foreach ($subImages as $subImage){
-            $subImageName  =   $subImage->getClientOriginalName();
-            $subImageDirectory = 'sub-images/';
-            $subImageUrl = $subImageDirectory.$subImageName;
-            Image::make($subImage)->save($subImageUrl);
+            $imageExtension = $subImage->getClientOriginalExtension();
+            $imageName = str_random(16).'.'.$imageExtension;
+            $directory = 'sub-images/';
+            $subImageUrl = $directory.$imageName;
+            Image::make($subImage)->resize(310,350)->save($subImageUrl);
 
             $subImage = new SubImage();
             $subImage->product_id = $productId;
@@ -77,11 +79,17 @@ class ProductController extends Controller
         $productById = DB::table('products')
             ->join('categories', 'products.category_id', '=', 'categories.id')
             ->join('brands', 'products.brand_id', '=', 'brands.id')
-            ->join('sub_images', 'products.id', '=', 'sub_images.id')
-            ->select('products.*', 'categories.category_name', 'brands.brand_name', 'sub_images.sub_image')
+            //->join('sub_images', 'products.id', '=', 'sub_images.id')
+            ->select('products.*', 'categories.category_name', 'brands.brand_name')
             ->where('products.id',$id)
             ->first();
-        return view('admin.product.view-product',['product'=>$productById]);
+
+        $subImages = SubImage::where('sub_images.product_id', $id)->get();
+
+        return view('admin.product.view-product',[
+            'product'=>$productById,
+            'subImages'=>$subImages
+        ]);
     }
 
     public function publishedProductInfo($id){
@@ -99,59 +107,85 @@ class ProductController extends Controller
     }
 
     public function editProductInfo($id){
-        $productById = Product::find($id);
-        $categories = Category::all();
-        $brands = Brand::all();
-        return view('admin.product.edit-product', ['product'=>$productById, 'categories'=>$categories, 'brands'=>$brands]);
+        $productById =DB::table('products')
+            ->join('categories','products.category_id','=','categories.id')
+            ->join('brands','products.brand_id','=','brands.id')
+            ->select('products.*','categories.category_name','brands.brand_name')
+            ->where('products.id','=', $id)
+            ->first();
+        $publishedCategories = Category::where('publication_status',1)->get();
+        $publishedBrands = Brand::where('publication_status',1)->get();
+        $subImages = SubImage::where('sub_images.product_id','=', $id)->get();
+
+        return view('admin.product.edit-product',[
+            'product'=>$productById,
+            'publishedCategories'=>$publishedCategories,
+            'publishedBrands'=>$publishedBrands,
+            'subImages'=>$subImages
+        ]);
     }
 
     public function updateProductInfo(Request $request){
 
-        $productImage = $request->file('product_image');
-        $imageName  =   $productImage->getClientOriginalName();
-        $directory = 'product-image/';
-        $imageUrl   = $directory.$imageName;
-        Image::make($productImage)->save($imageUrl);
-
 
         $productById = Product::find($request->product_id);
-        $product = new Product();
-        $product->product_name = $request->product_name;
-        $product->category_id = $request->category_id;
-        $product->brand_id = $request->brand_id;
-        $product->product_price = $request->product_price;
-        $product->product_quantity = $request->product_quantity;
-        $product->short_description = $request->short_description;
-        $product->long_description = $request->long_description;
-        $product->product_image = $imageUrl;
-        $product->publication_status = $request->publication_status;
-        $product->save();
-        $productId = $product->id;
+        @unlink($productById->product_image);
+
+        $subImages = SubImage::where('sub_images.product_id', '=',$productById->id )->get();
+        foreach ($subImages as $subImage){
+            @unlink($subImage->sub_image);
+            $subImage->delete();
+        }
+
+        $productImage = $request->file('product_image');
+        $imageExtension = $productImage->getClientOriginalExtension();
+        $imageName = time().'.'.$imageExtension;
+        $directory = 'product-images/';
+        $imageUrl = $directory.$imageName;
+        Image::make($productImage)->resize(310,350)->save($imageUrl);
+
+
+        $productById->product_name = $request->product_name;
+        $productById->category_id = $request->category_id;
+        $productById->brand_id = $request->brand_id;
+        $productById->product_price = $request->product_price;
+        $productById->product_quantity = $request->product_quantity;
+        $productById->short_description = $request->short_description;
+        $productById->long_description = $request->long_description;
+        $productById->product_image = $imageUrl;
+        $productById->publication_status = $request->publication_status;
+        $productById->save();
+        $productId = $productById->id;
 
 
         $subImages = $request->file('sub_image');
         foreach ($subImages as $subImage){
-            $subImageName  =   $subImage->getClientOriginalName();
-            $subImageDirectory = 'sub-images/';
-            $subImageUrl = $subImageDirectory.$subImageName;
-            Image::make($subImage)->save($subImageUrl);
+            $imageExtension = $subImage->getClientOriginalExtension();
+            $imageName = str_random(16).'.'.$imageExtension;
+            $directory = 'sub-images/';
+            $subImageUrl = $directory.$imageName;
+            Image::make($subImage)->resize(310,350)->save($subImageUrl);
 
             $subImage = new SubImage();
             $subImage->product_id = $productId;
             $subImage->sub_image = $subImageUrl;
             $subImage->save();
         }
-        return redirect('/product/manage-product')->with('message', 'Product Info Updated Successfully.');
+        return redirect('/product/manage-product')->with('message','Product info update successfully !!');
     }
 
     public function deleteProductInfo($id){
-        $product = Product::find($id);
-        @unlink($product->product_image);
-        $subImages = SubImage::where('sub_images.product_id', '=', $id)->get();
+
+        $productById = Product::find($id);
+        @unlink($productById->product_image);
+
+        $subImages = SubImage::where('sub_images.product_id', '=',$id )->get();
         foreach ($subImages as $subImage){
-            @unlink(asset('/').$subImage);
+            @unlink($subImage->sub_image);
+            $subImage->delete();
         }
-        $product->delete();
+
+        $productById->delete();
         return redirect('/product/manage-product')->with('message', 'Product Info Deleted Successfully.');
     }
 }

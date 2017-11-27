@@ -66,19 +66,19 @@
                             </tr>
                             <tr>
                                 <th>Product Image</th>
-                                <td><img src="{{asset($product->product_image)}}" alt="{{$product->product_name}}" style="height: 255px;"></td>
+                                <td><img src="{{ asset($product->product_image) }}" alt="{{$product->product_name}}" style="width:50px; height: 50px;"></td>
                             </tr>
                             <tr>
                                 <th>Product Sub Images</th>
                                 <td>
-                                    @foreach($product as $subImages)
-                                    <img src="{{asset($subImages->sub_image)}}" alt="{{$subImages->sub_image}}" style="height: 255px;">
+                                    @foreach($subImages as $subImage)
+                                    <img src="{{asset($subImage->sub_image)}}" alt="{{$subImage->sub_image}}" style="width:50px; height: 50px;">
                                         @endforeach
                                 </td>
                             </tr>
                             <tr>
                                 <th>Publication Status</th>
-                                <td>{{$product->publication_status==1? 'Published':'Unpublished'}}</td>
+                                <td><span class="label label-success">{{$product->publication_status==1? 'Published':'Unpublished'}}</span></td>
                             </tr>
                         </table>
                     </div>
